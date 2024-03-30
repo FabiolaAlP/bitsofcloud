@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Learn how to deploy a static website to Amazon S3 with step-by-step instructions."
+    />
+
+    <link href="styles.css" rel="stylesheet" />
+    <title>Cloud Journey</title>
+  </head>
+  <body
+    class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 min-h-screen relative"
+  >
+    <header
+      class="bg-blue-200 dark:bg-blue-800 dark:text-white shadow-md h-20 mb-5"
+    >
+      <nav class="flex justify-evenly items-center px-4 sm:px-6 lg:px-8 h-full">
+        <div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-9 h-9 hover:rotate-12"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.848 5.25 5.25 0 0 0-10.233 2.33A4.502 4.502 0 0 0 2.25 15Z"
+            />
+          </svg>
+        </div>
+        <ul class="hidden sm:flex gap-4">
+          <li>
+            <a
+              class="font-ibm hover:underline active:underline text-lg md:text-xl lg:text-2xl"
+              href="/"
+              >Bits of Cloud</a
+            >
+          </li>
+        </ul>
+        <div>
+          <button id="toggleTheme">
+            <svg
+              id="lightIcon"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-9 h-9 hover:rotate-12"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+              />
+            </svg>
+            <svg
+              id="darkIcon"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-9 h-9 hover:rotate-12"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+              />
+            </svg>
+          </button>
+        </div>
+        <button class="block sm:hidden" id="toggleMenu">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-9 h-9"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        </button>
+      </nav>
+      <nav
+        id="mobileMenu"
+        class="hidden sm:hidden bg-blue-200 dark:bg-blue-800 dark:text-white"
+      >
+        <ul class="flex flex-col items-center">
+          <li>
+            <a
+              class="font-ibm hover:underline active:underline text-lg md:text-xl lg:text-2xl"
+              href="/"
+              >Bits of Cloud</a
+            >
+          </li>
+        </ul>
+      </nav>
+      <div class="max-w-3xl mx-auto px-4">
+        <hr class="border-1 border-gray-800 dark:border-gray-100" />
+      </div>
+    </header>
+    <!--main had flex-wrap-->
+    <main
+      class="flex justify-center flex-col items-center pb-16 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-3xl mx-auto px-4 mt-16">
+        <h1 class="text-balance text-3xl my-4 font-ibm">Cloud Journey</h1>
+      </div>
+      <div class="flex justify-center items-center my-5">
+        <details class="border-2 border-dotted rounded-xl border-gray-500 p-4">
+          <summary class="cursor-pointer font-bold font-ibm mb-2 text-center">
+            Table of Contents
+          </summary>
+          <ol class="list-decimal list-inside pl-4">
+            <li>
+              <a class="hover:underline" href="#step-1"
+                >Create an AWS account</a
+              >
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-2"
+                >Access the AWS Management Console</a
+              >
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-3"
+                >Register a domain with Route 53</a
+              >
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-4">Search for domain</a>
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-5"
+                >Check domain request status</a
+              >
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-6">Access Amazon S3</a>
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-7">Create bucket</a>
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-8"
+                >Enable static website hosting</a
+              >
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-9">Edit bucket policy</a>
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-10"
+                >Upload files to bucket</a
+              >
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-11">Redirect to bucket</a>
+            </li>
+            <li>
+              <a class="hover:underline" href="#step-12"
+                >Access your static website</a
+              >
+            </li>
+          </ol>
+        </details>
+      </div>
+      <article
+        class="container mx-auto justify-center flex flex-col p-4 md:p-8 mb-4 border-2 border-dotted rounded-xl border-gray-500"
+      >
+        <h2
+          class="text-balance text-lg md:text-xl lg:text-2xl my-2 mx-auto font-bold font-ibm"
+        >
+          Hosting a static website on Amazon S3
+        </h2>
+        <div class="text-left">
+          <p class="text-pretty text-base md:text-lg lg:text-xl">
+            We will be hosting a static website on Amazon S3. The services that
+            we will be using are Route 53 and Amazon S3.
+            <br />
+            <span class="font-bold font-ibm">Route 53</span> is a Domain Name
+            System (DNS) web service that connects user requests to internet
+            applications running on AWS or on-premises.
+            <br />
+            <span class="font-bold font-ibm">Amazon S3</span> is an object
+            storage service that allows you to store and retrieve any amount of
+            data from anywhere.
+          </p>
+        </div>
+
+        <div>
+          <h3
+            class="font-bold font-ibm text-balance text-base sm:text-lg md:text-xl lg:text-2xl my-2 text-left"
+          >
+            Steps
+          </h3>
+          <ol class="list-inside list-decimal">
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-1">
+              Create an AWS account if you don't have one. If you do, log into
+              your account.
+              <details>
+                <summary class="font-ibm cursor-pointer font-bold">
+                  AWS root account
+                </summary>
+                <p class="text-pretty">
+                  When you create your first AWS account, it will be the root
+                  account, which gives you access to all the resources in the
+                  account. The root account shouldn't be used for everyday
+                  tasks. Instead, use the root account to create an admin
+                  account. This admin account can then be used to create other
+                  accounts with different permissions.
+                </p>
+              </details>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/aws-cmg.png"
+                  loading="lazy"
+                  alt="aws sign in page"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-2">
+              Access the AWS Management Console and use the search bar to look
+              for "Route 53".
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/image.png"
+                  loading="lazy"
+                  alt="AWS Management Console home page"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-3">
+              On the Route 53 Dashboard, look for the option "Domain
+              registration", and click on the button "Register domain".
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53dash.png"
+                  loading="lazy"
+                  alt="AWS Management Console Route 53"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-4">
+              Search for a domain that you would like to acquire and click on
+              the button "Proceed to checkout".In the next step, you will see
+              the domain pricing options. For this example, I'll purchase the
+              domain for the duration of one year, but you can change this
+              option to get it for a longer time. Also, if you don't want
+              Auto-renew to be turned on, uncheck this option. To continue,
+              click on the "Next" button. You'll have to provide contact
+              information to continue with the domain registration. Once you
+              complete the form, click on "Next". For the last part of this
+              step, you can review your domain registration and click "Submit".
+              <div class="py-2"></div>
+
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-register.png"
+                  loading="lazy"
+                  alt="Route 53 register domain"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-register2.png"
+                  loading="lazy"
+                  alt="route 53 domain registry pricing"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-register3.png"
+                  loading="lazy"
+                  alt="route 53 domain registry contact form"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-register4.png"
+                  loading="lazy"
+                  alt="review and submit domain registry on Route 53"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-5">
+              It will take a couple of minutes for your domain to be ready (so
+              don't forget to stretch and grab a snack).Back in the Route 53
+              Dashboard, you can see the status of your domain request. Be sure
+              to check your email because you need to verify the email you
+              provided during the domain registry. Also, you'll be notified when
+              the email is verified and your domain is registered.
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-domain.png"
+                  loading="lazy"
+                  alt="Route 53 domain request status"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-email.png"
+                  loading="lazy"
+                  alt="verify email address"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-email2.png"
+                  loading="lazy"
+                  alt="registry confirmation email"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53-domain2.png"
+                  loading="lazy"
+                  alt="Rouet 53 domain request success status"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-6">
+              Use the search bar of the AWS Management Console and type "S3";
+              we'll create our first bucket.
+              <details>
+                <summary class="font-ibm cursor-pointer font-bold">
+                  S3 Bucket
+                </summary>
+                <p class="text-pretty">
+                  Think of a bucket as a container for the objects you'll store.
+                </p>
+              </details>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3.png"
+                  loading="lazy"
+                  alt="AWS Management Console S3"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-7">
+              Once you're on Amazon S3, click on "Create bucket". <br />
+              When creating our bucket, select a region near you, and under
+              "Bucket name", name it the same as your domain. <br />
+              For the section "Block Public Access settings for this bucket",
+              uncheck the option "Block all public access". Scroll all the way
+              down and click "Create bucket". You'll see a notification that
+              your bucket was created successfully.
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3createbucket.png"
+                  loading="lazy"
+                  alt="Amazon S3 create bucket"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3bucketname.png"
+                  loading="lazy"
+                  alt="S3 create bucket"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3bucketaccess.png"
+                  loading="lazy"
+                  alt="S3 bucket block all public access"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3bucketcreation.png"
+                  loading="lazy"
+                  alt="bucket creation successfully"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-8">
+              Now we have to enable static website hosting. For this step, we
+              must select our bucket, and look for the option "Properties". We
+              will scroll all the way down to the section "Static website
+              hosting" and click on "Edit". <br />
+              Choose "Enable" for "Static website hosting" and under "Index
+              document" type "index.html". Finally, click on "Save changes".
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3bucketselection.png"
+                  loading="lazy"
+                  alt="Amazon S3 bucket"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3properties.png"
+                  loading="lazy"
+                  alt="S3 bucket properties"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3static.png"
+                  loading="lazy"
+                  alt="enable static website hosting"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3index.png"
+                  loading="lazy"
+                  alt="enable static website hsoting"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-9">
+              Back in our bucket, we'll look for the "Permissions" option.
+              Scroll to the section "Bucket policy" and click on "Edit".
+              <br />
+              Then, we click on "Add new statement", and under "Choose service"
+              type "S3". Then, we will be able to filter the actions, type
+              "GetObject" and select this option.
+              <br />
+              Click "Add" on "Add resource", and we'll add our bucket under
+              "Resource ARN". Then click "Add resource" button. <br />
+              Back in our policy on "Principal", replace the curly braces with
+              <code> "*" </code>. <br />
+              Finally, click on "Save changes". You'll see a notification that
+              your bucket policy was edited successfully.
+              <details>
+                <summary class="font-ibm cursor-pointer font-bold">
+                  S3 Bucket Policy
+                </summary>
+                <p class="text-pretty">
+                  A Bucket Policy allows us to grant access to our S3 Buckets
+                  and the objects stored in them.
+                  <br />
+                  <span class="font-ibm font-bold block underline"
+                    >Key concepts to remember</span
+                  >
+
+                  <span class="font-ibm font-bold block">Principal:</span>
+                  Refers to the account, user, or service who can access the
+                  actions and resources as specified in the policy.
+                  <span class="font-ibm font-bold block">Effect:</span>
+                  Determines whether to "Allow" or "Deny" actions when requested
+                  by an user.
+                  <span class="font-ibm font-bold block">Actions:</span>
+                  This refers to operations that can be allowed or denied on a
+                  resource.
+                  <span class="font-ibm font-bold block">Resource:</span>
+                  It can be the S3 Bucket, objects that the policy applies to.
+                </p>
+              </details>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3permissions.png"
+                  loading="lazy"
+                  alt="Amazon S3 bucket permissions"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3bucketpolicy.png"
+                  loading="lazy"
+                  alt="S3 bucket policy"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3addstatement.png"
+                  loading="lazy"
+                  alt="S3 bucket policy add statement"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3chooseservice.png"
+                  loading="lazy"
+                  alt="S3 bucket policy choose service"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3getobject.png"
+                  loading="lazy"
+                  alt="S3 bucket policy get object action"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3addresource.png"
+                  loading="lazy"
+                  alt="S3 bucket policy add resource"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3arn.png"
+                  loading="lazy"
+                  alt="S3 bucket policy ARN resource"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3principal.png"
+                  loading="lazy"
+                  alt="S3 bucket policy principal"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-10">
+              Now, it's time to upload our files to our bucket. Hit "Upload" or
+              drag and drop your files.
+
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/s3upload.png"
+                  loading="lazy"
+                  alt="S3 bucket upload file"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-11">
+              We'll go back to Route 53 Dashboard; we need our domain to
+              redirect to our bucket. Select "Hosted zone". Then "Create
+              record". <br />
+              Select the option "Switch to wizard", this will guide us in adding
+              our record. Choose "Simple routing" in Routing policy and click
+              "Next". <br />
+              Under "Configure records", click "Define simple record". Under
+              "Value/Route traffic to", select "Choose endpoint", look for
+              "Alias to S3 website endpoint". For the region, choose the region
+              in which you created your bucket. Next, for the "S3 endpoint",
+              select the S3 service. Click "Define simple record". Finally,
+              select "Create records".
+
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53hostedzone.png"
+                  loading="lazy"
+                  alt="Route 53 hosted zone"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/route53selecthosted.png"
+                  loading="lazy"
+                  alt="Route 53 select hosted zone"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/createrecord.png"
+                  loading="lazy"
+                  alt="Route 53 create record"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/wizard.png"
+                  loading="lazy"
+                  alt="Route 53 select wizard"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/simplerouting.png"
+                  loading="lazy"
+                  alt="Route 53 routing policy"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/definerecord.png"
+                  loading="lazy"
+                  alt="Route 53 define record"
+                />
+              </div>
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/createrecords.png"
+                  loading="lazy"
+                  alt="Route 53 confirm record creation"
+                />
+              </div>
+            </li>
+            <li class="text-base md:text-lg lg:text-xl my-4" id="step-12">
+              For our last step, access your domain from another tab in your
+              browser. You should be able to see your static site.
+              <span class="block font-bold font-ibm"
+                >Don't forget to clean up, so you don't incur extra
+                charges.</span
+              >
+
+              <div class="py-2"></div>
+              <div
+                class="container mx-auto rounded-xl overflow-hidden border-2 border-gray-100"
+              >
+                <img
+                  class="w-full h-auto object-cover"
+                  src="https://raw.githubusercontent.com/FabiolaAlP/my-s3-bucket-images/main/uploads/dummysite.png"
+                  loading="lazy"
+                  alt="static wesbite example"
+                />
+              </div>
+            </li>
+          </ol>
+        </div>
+      </article>
+    </main>
+    <footer
+      class="absolute bottom-0 w-full h-14 sm:h-16 flex justify-center items-center bg-gray-200 dark:bg-gray-800 text-black dark:text-white"
+    >
+      <span class="font-bold font-ibm px-4 sm:px-0"
+        >Copyright &copy; <span id="year"></span> | All rights reserved.</span
+      >
+    </footer>
+    <button
+      id="scrollToTopBtn"
+      class="hidden fixed bottom-5 right-5 bg-gray-800/80 dark:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
+        />
+      </svg>
+    </button>
+    <script src="theme.js" type="module"></script>
+  </body>
+</html>
