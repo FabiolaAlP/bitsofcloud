@@ -1,49 +1,44 @@
-const toggleBtn = document.getElementById("toggleTheme");
-const darkIconContainer = document.getElementById("darkIcon");
-const lightIconContainer = document.getElementById("lightIcon");
-const userPreference = "preference";
+const toggleThemeBtn = document.getElementById("toggleTheme");
+const darkThemeIcon = document.getElementById("darkIcon");
+const lightThemeIcon = document.getElementById("lightIcon");
+const userPreferenceKey = "preference";
 const menuBtn = document.getElementById("toggleMenu");
 const menu = document.getElementById("mobileMenu");
 const scrollToTopBtn = document.getElementById("scrollToTopBtn");
 const year = document.getElementById("year");
 year.innerHTML = new Date().getFullYear();
-const setTheme = (option) => {
-  localStorage.setItem(userPreference, option);
-};
-const themeHandler = () => {
-  document.documentElement.classList.toggle("dark");
-  const element = document.documentElement.classList.contains("dark");
-  if (element) {
-    setTheme("dark");
-    changeThemeIcon("dark");
-  } else {
-    setTheme("light");
-    changeThemeIcon("light");
-  }
-};
 
-const mobileMenuHandler = () => {
-  menu.classList.toggle("hidden");
-};
-
-const userColorScheme = () => {
-  const userTheme = localStorage.getItem(userPreference);
-  if (userTheme === "dark") {
+const setTheme = (theme) => {
+  localStorage.setItem(userPreferenceKey, theme);
+  if (theme === "dark") {
     document.documentElement.classList.add("dark");
-    changeThemeIcon("dark");
+    lightThemeIcon.style.display = "block";
+    darkThemeIcon.style.display = "none";
   } else {
     document.documentElement.classList.remove("dark");
-    changeThemeIcon("light");
+    lightThemeIcon.style.display = "none";
+    darkThemeIcon.style.display = "block";
   }
 };
-const changeThemeIcon = (option) => {
-  if (option === "dark") {
-    lightIconContainer.style.display = "block";
-    darkIconContainer.style.display = "none";
-  } else {
-    lightIconContainer.style.display = "none";
-    darkIconContainer.style.display = "block";
-  }
+
+const toggleTheme = () => {
+  const isDarkMode = document.documentElement.classList.contains("dark");
+  const newTheme = isDarkMode ? "light" : "dark";
+  setTheme(newTheme);
+};
+
+const initializeTheme = () => {
+  const storedUserPreference = localStorage.getItem(userPreferenceKey);
+  const systemPreference = window.matchMedia("(prefers-color-scheme: dark)")
+    .matches
+    ? "dark"
+    : "light";
+  const initialTheme = storedUserPreference || systemPreference;
+
+  setTheme(initialTheme);
+};
+const mobileMenuHandler = () => {
+  menu.classList.toggle("hidden");
 };
 const handleScroll = () => {
   if (window.scrollY >= 500) {
@@ -59,8 +54,8 @@ const scrollToTop = () => {
   });
 };
 
-userColorScheme();
-toggleBtn.addEventListener("click", themeHandler);
+initializeTheme();
 menuBtn.addEventListener("click", mobileMenuHandler);
+toggleThemeBtn.addEventListener("click", toggleTheme);
 window.addEventListener("scroll", handleScroll);
 scrollToTopBtn.addEventListener("click", scrollToTop);
